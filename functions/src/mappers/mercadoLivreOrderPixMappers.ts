@@ -1,4 +1,4 @@
-import { OrderPix } from "../types/createOrderPixTypings";
+import { OrderPix } from "../endpoints/pix/types/createOrderPixTypings";
 
 export const createMercadoLivreOrderPixMapper = (
   orderPix: OrderPix
@@ -12,6 +12,7 @@ export const createMercadoLivreOrderPixMapper = (
     status_detail: orderPix.status_detail,
     transaction_amount: orderPix.transaction_amount,
     mainProductId: orderPix.mainProductId,
+    userId: orderPix.userId,
     point_of_interaction: {
       transaction_data: {
         qr_code: orderPix.point_of_interaction.transaction_data.qr_code,

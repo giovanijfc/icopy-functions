@@ -1,7 +1,9 @@
 export const CREATE_PIX_PAYLOAD = {
   description: "iCopy notificação 1 mês",
   payment_method_id: "pix",
-  notification_url: "https://url-webhook.com",
+  notification_url: process.env.MERCADO_LIVRE_WEB_HOOK?.concat(
+    "?source_news=webhooks"
+  ),
   payer: {
     email: "giovanijfc@gmail.com",
     first_name: "Giovani",

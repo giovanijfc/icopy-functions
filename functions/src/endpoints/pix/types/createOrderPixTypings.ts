@@ -2,11 +2,11 @@ export interface CreateOrderPixBody {
   mainProductId: string;
 }
 
-export interface CreateMercadoLivreOrderPix {
+export interface MercadoLivreOrderPix {
   id: number;
   date_created: Date;
   date_of_expiration: Date;
-  status: "pending";
+  status: "pending" | "approved" | "authorized";
   payment_method_id: "pix";
   status_detail: "pending_waiting_transfer";
   transaction_amount: number;
@@ -19,6 +19,7 @@ export interface CreateMercadoLivreOrderPix {
   };
 }
 
-export interface OrderPix extends CreateMercadoLivreOrderPix {
+export interface OrderPix extends MercadoLivreOrderPix {
   mainProductId: string;
+  userId: string
 }
