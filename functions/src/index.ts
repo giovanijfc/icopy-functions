@@ -1,17 +1,10 @@
-import { onRequest } from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger";
+import { setDefaultOptions } from "date-fns";
+import { ptBR as localePtBR } from "date-fns/locale/pt-BR";
 
-export const getDate = onRequest((request, response) => {
-  const currentDate = new Date();
+import admin from "firebase-admin";
 
-  logger.log("getDate/currentDate/v2", currentDate);
+admin.initializeApp();
 
-  response.send({
-    message: "Segue a data ",
-    data: `${currentDate.getDate().toString().padStart(2, "0")}/${(
-      currentDate.getMonth() + 1
-    )
-      .toString()
-      .padStart(2, "0")}/${currentDate.getFullYear()}`,
-  });
-});
+setDefaultOptions({ locale: localePtBR });
+
+export * from "./endpoints";
