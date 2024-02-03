@@ -44,9 +44,10 @@ export const createOrderPix = onRequest(async (req, res) => {
     }
 
     logger.info("Criando order de pix no mercado livre");
-    const orderPixResponse = await postMercadoLivreCreateOrderPix(
-      product?.price
-    );
+    const orderPixResponse = await postMercadoLivreCreateOrderPix({
+      amount: product.price,
+      email: user.email || "contato.icopy@gmail.com",
+    });
 
     const orderPix = createMercadoLivreOrderPixMapper({
       ...orderPixResponse,

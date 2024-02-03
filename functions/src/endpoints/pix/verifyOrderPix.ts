@@ -62,10 +62,10 @@ export const verifyOrderPix = onRequest(async (req, res) => {
   //   return;
   // }
 
-  const orderPixId = Number(notification.data.id);
+  const orderId = Number(notification.data.id);
 
   logger.info("Buscando ordem de pix no mercado livre");
-  const orderPixMercadoLivre = await fetchOrderPix(orderPixId);
+  const orderPixMercadoLivre = await fetchOrderPix(orderId);
 
   if (!orderPixMercadoLivre) {
     logger.error("Nenhuma ordem pix encontrada no mercado livre");
@@ -80,7 +80,7 @@ export const verifyOrderPix = onRequest(async (req, res) => {
     await admin
       .firestore()
       .collection("/orders")
-      .where("id", "==", orderPixId)
+      .where("id", "==", orderId)
       .get()
   ).docs[0];
   let orderPixData = orderPixRef.data() as unknown as OrderPix | undefined;
@@ -123,7 +123,7 @@ export const verifyOrderPix = onRequest(async (req, res) => {
     productMainId: product.main_id,
     createdAt: createdAccess.toISOString(),
     expirationAt: addDays(createdAccess, product.numberOfDays).toISOString(),
-    orderPixId,
+    orderId,
     userId: orderPixData.userId,
   } as ProductAccess);
 

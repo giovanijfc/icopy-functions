@@ -7,14 +7,14 @@ export interface Product {
   details_url: string;
   price: number;
   button_buy_label: string;
-  numberOfDays: number
+  numberOfDays: number;
 }
 
 export interface ProductAccess {
-  productId: string
-  productMainId: string
-  orderPixId: number
-  expirationAt: string
-  createdAt: string
-  userId: string
+  productId: string;
+  productMainId: string;
+  orderId: number;
+  expirationAt: string;
+  createdAt: string;
+  userId: string;
 }
