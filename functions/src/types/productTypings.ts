@@ -16,5 +16,6 @@ export interface ProductAccess {
   orderId: number;
   expirationAt: string;
   createdAt: string;
+  updatedAt: string | null;
   userId: string;
 }

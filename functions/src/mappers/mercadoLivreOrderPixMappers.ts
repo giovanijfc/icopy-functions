@@ -12,6 +12,7 @@ export const createMercadoLivreOrderPixMapper = (
     status_detail: orderPix.status_detail,
     transaction_amount: orderPix.transaction_amount,
     mainProductId: orderPix.mainProductId,
+    productId: orderPix.productId,
     userId: orderPix.userId,
     point_of_interaction: {
       transaction_data: {

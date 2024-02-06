@@ -52,6 +52,7 @@ export const createOrderPix = onRequest(async (req, res) => {
     const orderPix = createMercadoLivreOrderPixMapper({
       ...orderPixResponse,
       mainProductId,
+      productId: product.id,
       userId: user.uid,
     });
 

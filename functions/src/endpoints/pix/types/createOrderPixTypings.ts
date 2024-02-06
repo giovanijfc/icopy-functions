@@ -6,7 +6,7 @@ export interface MercadoLivreOrderPix {
   id: number;
   date_created: Date;
   date_of_expiration: Date;
-  status: "pending" | "approved" | "authorized";
+  status: "pending" | "approved" | "authorized" | "refunded" | "chargedback" ;
   payment_method_id: "pix";
   status_detail: "pending_waiting_transfer";
   transaction_amount: number;
@@ -21,5 +21,6 @@ export interface MercadoLivreOrderPix {
 
 export interface OrderPix extends MercadoLivreOrderPix {
   mainProductId: string;
+  productId: string
   userId: string
 }

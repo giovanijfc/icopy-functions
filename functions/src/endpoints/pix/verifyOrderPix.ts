@@ -12,7 +12,7 @@ import { OrderPix } from "./types/createOrderPixTypings";
 import { createMercadoLivreOrderPixMapper } from "../../mappers/mercadoLivreOrderPixMappers";
 import { fetchProductByMainId } from "./utils/fetchProductByMainId";
 import { ProductAccess } from "../../types/productTypings";
-import { addDays } from "date-fns";
+import { addDays, parseISO } from "date-fns";
 
 export const verifyOrderPix = onRequest(async (req, res) => {
   const xSignature = req.headers["x-signature"] as string;
@@ -93,15 +93,6 @@ export const verifyOrderPix = onRequest(async (req, res) => {
     return;
   }
 
-  orderPixData = createMercadoLivreOrderPixMapper({
-    ...orderPixMercadoLivre,
-    mainProductId: orderPixData.mainProductId,
-    userId: orderPixData.userId,
-  });
-  logger.info("Atualizando ordem de pix no nosso bd");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  orderPixRef.ref.update(orderPixData as any);
-
   logger.info("Buscando produto");
 
   const product = await fetchProductByMainId(orderPixData.mainProductId);
@@ -116,18 +107,66 @@ export const verifyOrderPix = onRequest(async (req, res) => {
     .firestore()
     .collection("/product_access");
 
-  const createdAccess = new Date();
+  if (orderPixMercadoLivre.status === "approved") {
+    const createdAccess = new Date();
 
-  await productAccessCollection.add({
-    productId: product.id,
-    productMainId: product.main_id,
-    createdAt: createdAccess.toISOString(),
-    expirationAt: addDays(createdAccess, product.numberOfDays).toISOString(),
-    orderId,
+    await productAccessCollection.add({
+      productId: product.id,
+      productMainId: product.main_id,
+      createdAt: createdAccess.toISOString(),
+      expirationAt: addDays(createdAccess, product.numberOfDays).toISOString(),
+      updatedAt: null,
+      orderId,
+      userId: orderPixData.userId,
+    } as ProductAccess);
+
+    logger.info("Acesso de produto criado com sucesso");
+  }
+
+  if (
+    orderPixMercadoLivre.status === "refunded" ||
+    orderPixMercadoLivre.status === "chargedback"
+  ) {
+    logger.info(
+      "Buscando acesso para remover por conta de refund/chargeback"
+    );
+
+    const accessRef = (
+      await productAccessCollection
+        .where("orderId", "==", orderId)
+        .get()
+    ).docs[0];
+
+    const accessData = accessRef.data() as ProductAccess | undefined;
+
+    if (!accessData) {
+      logger.error("Acesso não encontrado");
+      res.status(404).send({ message: "Acesso não encontrado" });
+      return;
+    }
+
+    accessRef.ref.update({
+      ...accessData,
+      expirationAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as ProductAccess as any);
+
+    logger.info(
+      "Acesso removido com sucesso!"
+    );
+  }
+
+  orderPixData = createMercadoLivreOrderPixMapper({
+    ...orderPixMercadoLivre,
+    mainProductId: orderPixData.mainProductId,
+    productId: orderPixData.productId,
     userId: orderPixData.userId,
-  } as ProductAccess);
+  });
 
-  logger.info("Acesso de produto criado com sucesso");
+  logger.info("Atualizando ordem de pix no nosso bd");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  orderPixRef.ref.update(orderPixData as any);
 
   res.send({ message: "Verificação feita com sucesso!" });
 });
